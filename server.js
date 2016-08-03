@@ -3,6 +3,7 @@
 
 // init project
 var MailListener = require("mail-listener2");
+var request = require('request');
 var express = require('express');
 var app = express();
 
@@ -22,9 +23,34 @@ app.get("/dreams", function (request, response) {
 });
 
 // could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
-app.post("/dreams", function (request, response) {
-  dreams.push(request.query.dream);
-  mailListener.
+app.post("/dreams", function (req, response) {
+  dreams.push(req.query.dream);
+  
+  var payload = {
+    "leadRecord": {
+        "acceptanceTermsAndConditions": true,
+        "salutation": "M",
+        "firstName": req.query.dream || 'Testman',
+        "lastName": "Coopers",
+        "phone": "01232345",
+        "eMail": "mail@example.com",
+        "city": "Metropolis",
+        "country": "DE",
+        "postalCode": "45555",
+        "street": "Mainstreet 4",
+        "hasOptedIn": true,
+        "leadSource": "HEATING_CALCULATOR_GLOBAL",
+        "leadReference": "www.heizungsprofi.de",
+        "userIpAddress": "127.0.0.1",
+        "energySource": ["GAS"]
+    }
+ };
+  var opts = {
+            url: 'https://visflms.herokuapp.com/lead',
+            json: payload,
+            timeout: 28000
+        };
+  request.post(opts);
   response.sendStatus(200);
 });
 
@@ -56,7 +82,7 @@ var mailListener = new MailListener({
 
 
 
-mailListener.start(); // start listening 
+//mailListener.start(); // start listening 
  
 // stop listening 
 //mailListener.stop(); 

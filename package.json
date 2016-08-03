@@ -11,7 +11,8 @@
 	},
 	"dependencies": {
 		"express": "^4.12.4",
-		"mail-listener2": "^0.1.8"
+		"mail-listener2": "^0.1.8",
+		"request": "^2.74.0"
 	},
 	"engines": {
 		"node": "4.4.3"
