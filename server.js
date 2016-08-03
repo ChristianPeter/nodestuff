@@ -1,0 +1,86 @@
+// server.js
+// where your node app starts
+
+// init project
+var MailListener = require("mail-listener2");
+var express = require('express');
+var app = express();
+
+// we've started you off with Express, 
+// but feel free to use whatever libs or frameworks you'd like through `package.json`.
+
+// http://expressjs.com/en/starter/static-files.html
+app.use(express.static('public'));
+
+// http://expressjs.com/en/starter/basic-routing.html
+app.get("/", function (request, response) {
+  response.sendFile(__dirname + '/views/index.html');
+});
+
+app.get("/dreams", function (request, response) {
+  response.send(dreams);
+});
+
+// could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
+app.post("/dreams", function (request, response) {
+  dreams.push(request.query.dream);
+  mailListener.
+  response.sendStatus(200);
+});
+
+// Simple in-memory store for now
+var dreams = [
+  "Find and count some sheep",
+  "Climb a really tall mountain",
+  "Wash the dishes"
+  ];
+
+// ---
+
+var buf = new Buffer('QWhjcDc5ZGs=', 'base64');
+var mailListener = new MailListener({
+  username: "peterchr.devcave@gmail.com",
+  password: buf.toString('ascii'),
+  host: "imap.gmail.com",
+  port: 993, // imap port 
+  tls: true,
+  tlsOptions: { rejectUnauthorized: false },
+  mailbox: "INBOX", // mailbox to monitor 
+  //searchFilter: ["UNSEEN", "FLAGGED"], // the search filter being used after an IDLE notification has been retrieved 
+  markSeen: true, // all fetched email willbe marked as seen and not fetched next time 
+  fetchUnreadOnStart: true, // use it only if you want to get all unread email on lib start. Default is `false`, 
+  mailParserOptions: {streamAttachments: true}, // options to be passed to mailParser lib. 
+  attachments: true, // download attachments as they are encountered to the project directory 
+  attachmentOptions: { directory: "attachments/" } // specify a download directory for attachments 
+});
+
+
+
+mailListener.start(); // start listening 
+ 
+// stop listening 
+//mailListener.stop(); 
+ 
+mailListener.on("server:connected", function(){
+  console.log("imapConnected");
+});
+ 
+mailListener.on("server:disconnected", function(){
+  console.log("imapDisconnected");
+});
+ 
+mailListener.on("error", function(err){
+  console.log(err);
+});
+ 
+mailListener.on("mail", function(mail, seqno, attributes){
+  // do something with mail object including attachments 
+  console.log("emailParsed", mail);
+  // mail processing code goes here 
+});
+
+
+// listen for requests :)
+var listener = app.listen(process.env.PORT, function () {
+  console.log('Your app is listening on port ' + listener.address().port);
+});
